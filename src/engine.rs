@@ -1,7 +1,7 @@
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::hit::Hit;
-use crate::searcher::Searcher;
+use crate::searcher::{SearchResult, Searcher};
 use crate::target::Target;
 
 pub struct Engine {
@@ -19,9 +19,15 @@ impl Engine {
             futures.push(searcher.search(target));
         }
 
-        let results: Vec<Vec<Hit>> = futures.collect().await;
+        let results: Vec<SearchResult> = futures.collect().await;
+        let mut successes: Vec<Hit> = vec![];
+        for mut result in results {
+            if let Ok(ref mut inner) = result {
+                successes.append(inner);
+            }
+        }
 
-        results.into_iter().flatten().collect()
+        successes
     }
 }
 
@@ -37,8 +43,8 @@ mod tests {
         struct S {}
         #[async_trait]
         impl Searcher for S {
-            async fn search(&self, _target: &Target) -> Vec<Hit> {
-                vec![
+            async fn search(&self, _target: &Target) -> SearchResult {
+                Ok(vec![
                     Hit {
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
@@ -49,7 +55,7 @@ mod tests {
                         model: "Fabia".to_string(),
                         price: Price::EUR(19995, 50),
                     },
-                ]
+                ])
             }
         }
 
@@ -70,6 +76,73 @@ mod tests {
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
                     price: Price::EUR(19995, 50),
+                },
+            )
+        );
+    }
+
+    #[tokio::test]
+    async fn multiple_searchers_combine_results() {
+        struct S0 {}
+        struct S1 {}
+
+        #[async_trait]
+        impl Searcher for S0 {
+            async fn search(&self, _target: &Target) -> SearchResult {
+                Ok(
+                vec![
+                    Hit {
+                        make: "Skoda".to_string(),
+                        model: "Fabia".to_string(),
+                        price: Price::EUR(19995, 50),
+                    },
+                    Hit {
+                        make: "Skoda".to_string(),
+                        model: "Fabia".to_string(),
+                        price: Price::EUR(19995, 50),
+                    },
+                ]
+                )
+            }
+        }
+
+        #[async_trait]
+        impl Searcher for S1 {
+            async fn search(&self, _target: &Target) -> SearchResult {
+                Ok(
+                vec![
+                    Hit {
+                        make: "Volkswagen".to_string(),
+                        model: "Golf".to_string(),
+                        price: Price::EUR(25000, 99),
+                    },
+                ]
+                )
+            }
+        }
+
+        let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
+        let engine = Engine::with_searchers(searchers);
+
+        let target = TargetBuilder::new().build();
+        let results = engine.search(&target).await;
+        assert_eq!(
+            results,
+            vec!(
+                Hit {
+                    make: "Skoda".to_string(),
+                    model: "Fabia".to_string(),
+                    price: Price::EUR(19995, 50),
+                },
+                Hit {
+                    make: "Skoda".to_string(),
+                    model: "Fabia".to_string(),
+                    price: Price::EUR(19995, 50),
+                },
+                Hit {
+                    make: "Volkswagen".to_string(),
+                    model: "Golf".to_string(),
+                    price: Price::EUR(25000, 99),
                 },
             )
         );
