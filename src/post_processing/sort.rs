@@ -1,6 +1,6 @@
 use std::cmp::Reverse;
 
-use crate::hit::Hit;
+use crate::{args::Args, hit::Hit};
 
 use super::Action;
 
@@ -23,6 +23,39 @@ pub enum SortOrder {
 impl Sort {
     pub fn new(by: SortBy, order: SortOrder) -> Self {
         Self { by, order }
+    }
+}
+
+impl From<&Args> for Option<Box<Sort>> {
+    fn from(args: &Args) -> Self {
+        match &args.sort_by {
+            None => None,
+            Some(key) => {
+                let sort_by = match key.as_str() {
+                    "price" => SortBy::Price,
+                    "mileage" => SortBy::Mileage,
+                    "year" => SortBy::Year,
+                    _ => {
+                        println!("Unrecognised key for sorting: {}, defaulting to price", key);
+                        SortBy::Price
+                    }
+                };
+
+                let sort_order = match &args.sort_order {
+                    Some(o) => match o.as_str() {
+                        "ASC" => SortOrder::Asc,
+                        "DESC" => SortOrder::Desc,
+                        _ => {
+                            println!("Unrecognised sort order: {}, default to ascending", o);
+                            SortOrder::Asc
+                        }
+                    },
+                    None => SortOrder::Asc,
+                };
+
+                Some(Box::new(Sort::new(sort_by, sort_order)))
+            }
+        }
     }
 }
 
