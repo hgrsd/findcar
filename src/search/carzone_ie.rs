@@ -129,7 +129,7 @@ impl Searcher for CarZoneIE {
         let ads = recursive_fetch(&client, query, 1, vec![]).await?;
         let mapped = ads
             .iter()
-            // Note: Carzone places premium ads of different makes in the search returns. 
+            // Note: Carzone places premium ads of different makes in the search returns.
             // Let's make sure we filter those out.
             .filter(|x| {
                 query.make.is_some()
