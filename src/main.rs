@@ -16,7 +16,7 @@ async fn main() {
     let args = args::Args::parse();
     let query: query::Query = (&args).into();
 
-    let searchers: Vec<Box<dyn search::Searcher>> = match args.search_engines {
+    let searchers: Vec<Box<dyn search::Searcher>> = match args.search_engine {
         None => {
             vec![
                 Box::new(search::CarZoneIE {}),
