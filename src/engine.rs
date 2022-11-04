@@ -22,8 +22,16 @@ impl Engine {
         let results: Vec<SearchResult> = futures.collect().await;
         let mut successes: Vec<Hit> = vec![];
         for mut result in results {
-            if let Ok(ref mut inner) = result {
-                successes.append(inner);
+            match result {
+                Ok(ref mut inner) => {
+                    successes.append(inner);
+                }
+                Err(error) => {
+                    println!(
+                        "An error was encountered in this search engine, results unavailable.\nReason: {}",
+                        error.to_string()
+                    );
+                }
             }
         }
 
@@ -33,10 +41,11 @@ impl Engine {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use async_trait::async_trait;
 
-    use super::*;
     use crate::{hit::Price, searcher::Searcher, target::TargetBuilder};
+    use std::io::{Error, ErrorKind};
 
     #[tokio::test]
     async fn single_searcher() {
@@ -89,8 +98,7 @@ mod tests {
         #[async_trait]
         impl Searcher for S0 {
             async fn search(&self, _target: &Target) -> SearchResult {
-                Ok(
-                vec![
+                Ok(vec![
                     Hit {
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
@@ -101,23 +109,18 @@ mod tests {
                         model: "Fabia".to_string(),
                         price: Price::EUR(19995, 50),
                     },
-                ]
-                )
+                ])
             }
         }
 
         #[async_trait]
         impl Searcher for S1 {
             async fn search(&self, _target: &Target) -> SearchResult {
-                Ok(
-                vec![
-                    Hit {
-                        make: "Volkswagen".to_string(),
-                        model: "Golf".to_string(),
-                        price: Price::EUR(25000, 99),
-                    },
-                ]
-                )
+                Ok(vec![Hit {
+                    make: "Volkswagen".to_string(),
+                    model: "Golf".to_string(),
+                    price: Price::EUR(25000, 99),
+                }])
             }
         }
 
@@ -143,6 +146,58 @@ mod tests {
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
                     price: Price::EUR(25000, 99),
+                },
+            )
+        );
+    }
+
+    #[tokio::test]
+    async fn errors_in_one_searcher_do_not_crash_engine() {
+        struct S0 {}
+        struct S1 {}
+
+        #[async_trait]
+        impl Searcher for S0 {
+            async fn search(&self, _target: &Target) -> SearchResult {
+                Ok(vec![
+                    Hit {
+                        make: "Skoda".to_string(),
+                        model: "Fabia".to_string(),
+                        price: Price::EUR(19995, 50),
+                    },
+                    Hit {
+                        make: "Skoda".to_string(),
+                        model: "Fabia".to_string(),
+                        price: Price::EUR(19995, 50),
+                    },
+                ])
+            }
+        }
+
+        #[async_trait]
+        impl Searcher for S1 {
+            async fn search(&self, _target: &Target) -> SearchResult {
+                Err(Error::new(ErrorKind::Other, "oh no"))
+            }
+        }
+
+        let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
+        let engine = Engine::with_searchers(searchers);
+
+        let target = TargetBuilder::new().build();
+        let results = engine.search(&target).await;
+        assert_eq!(
+            results,
+            vec!(
+                Hit {
+                    make: "Skoda".to_string(),
+                    model: "Fabia".to_string(),
+                    price: Price::EUR(19995, 50),
+                },
+                Hit {
+                    make: "Skoda".to_string(),
+                    model: "Fabia".to_string(),
+                    price: Price::EUR(19995, 50),
                 },
             )
         );
