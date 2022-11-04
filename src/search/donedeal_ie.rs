@@ -3,9 +3,9 @@
 use serde::{Deserialize, Serialize};
 use std::io::{Error, ErrorKind};
 
+use super::{SearchResult, Searcher};
 use crate::{
     hit::{Hit, Mileage, Price},
-    searcher::{SearchResult, Searcher},
     target::Target,
 };
 
@@ -150,20 +150,20 @@ impl Searcher for DoneDealIE {
     }
 }
 
-impl From<&DonedealAd> for Option<Price> {
+impl From<&DonedealAd> for Price {
     fn from(ad: &DonedealAd) -> Self {
         if ad.price.is_none() {
-            return None;
+            return Price::Unknown;
         }
 
         let unwrapped = ad.price.as_ref().unwrap();
         let parsed: i32 = unwrapped.replace(",", "").parse().unwrap();
-        Some(match ad.currency.as_str() {
+        match ad.currency.to_uppercase().as_str() {
             "EUR" => Price::Eur(parsed),
             "GBP" => Price::Gbp(parsed),
             "USD" => Price::Usd(parsed),
-            _ => unreachable!(),
-        })
+            _ => Price::Unknown,
+        }
     }
 }
 

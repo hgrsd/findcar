@@ -1,7 +1,7 @@
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::hit::Hit;
-use crate::searcher::{SearchResult, Searcher};
+use crate::search::{SearchResult, Searcher};
 use crate::target::Target;
 
 pub struct Engine {
@@ -43,7 +43,6 @@ mod tests {
 
     use crate::{
         hit::{Mileage, Price},
-        searcher::Searcher,
         target::Target,
     };
     use std::io::{Error, ErrorKind};
@@ -61,7 +60,7 @@ mod tests {
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::Eur(19995)),
+                        price: Price::Eur(19995),
                         url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
@@ -70,7 +69,7 @@ mod tests {
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::Eur(19995)),
+                        price: Price::Eur(19995),
                         url: "https://mycar.com/car".to_string(),
                     },
                 ])
@@ -91,7 +90,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::Eur(19995)),
+                    price: Price::Eur(19995),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
@@ -100,7 +99,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::Eur(19995)),
+                    price: Price::Eur(19995),
                     url: "https://mycar.com/car".to_string(),
                 },
             )
@@ -122,7 +121,7 @@ mod tests {
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::Eur(19995)),
+                        price: Price::Eur(19995),
                         url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
@@ -131,7 +130,7 @@ mod tests {
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::Eur(19995)),
+                        price: Price::Eur(19995),
                         url: "https://mycar.com/car".to_string(),
                     },
                 ])
@@ -147,7 +146,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
-                    price: Some(Price::Eur(25000)),
+                    price: Price::Eur(25000),
                     url: "https://mycar.com/car".to_string(),
                 }])
             }
@@ -167,7 +166,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::Eur(19995)),
+                    price: Price::Eur(19995),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
@@ -176,7 +175,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::Eur(19995)),
+                    price: Price::Eur(19995),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
@@ -185,7 +184,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
-                    price: Some(Price::Eur(25000)),
+                    price: Price::Eur(25000),
                     url: "https://mycar.com/car".to_string(),
                 },
             )
@@ -207,7 +206,7 @@ mod tests {
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::Eur(19995)),
+                        price: Price::Eur(19995),
                         url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
@@ -216,7 +215,7 @@ mod tests {
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::Eur(19995)),
+                        price: Price::Eur(19995),
                         url: "https://mycar.com/car".to_string(),
                     },
                 ])
@@ -244,7 +243,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::Eur(19995)),
+                    price: Price::Eur(19995),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
@@ -253,7 +252,7 @@ mod tests {
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::Eur(19995)),
+                    price: Price::Eur(19995),
                     url: "https://mycar.com/car".to_string(),
                 },
             )

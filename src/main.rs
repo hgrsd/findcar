@@ -1,11 +1,13 @@
 use clap::Parser;
 
 mod args;
+mod emit;
 mod engine;
 mod hit;
-mod searcher;
-mod searchers;
+mod search;
 mod target;
+
+use emit::{Emit, TextEmitter};
 
 #[tokio::main]
 async fn main() {
@@ -44,14 +46,10 @@ async fn main() {
         target.max_price(&max_price);
     }
 
-    let searchers: Vec<Box<dyn searcher::Searcher>> =
-        vec![Box::new(searchers::donedeal_ie::DoneDealIE {})];
-
+    let searchers: Vec<Box<dyn search::Searcher>> = vec![Box::new(search::DoneDealIE {})];
     let engine = engine::Engine::with_searchers(searchers);
-
     let results = engine.search(&target).await;
 
-    for result in results {
-        println!("{:?}", result);
-    }
+    let emitter = TextEmitter::new();
+    emitter.emit(results);
 }

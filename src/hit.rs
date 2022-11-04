@@ -3,6 +3,7 @@ pub enum Price {
     Eur(i32),
     Usd(i32),
     Gbp(i32),
+    Unknown,
 }
 
 #[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Clone)]
@@ -19,6 +20,6 @@ pub struct Hit {
     pub model: String,
     pub mileage: Mileage,
     pub year: u16,
-    pub price: Option<Price>,
+    pub price: Price,
     pub url: String,
 }
