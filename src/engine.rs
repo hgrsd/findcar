@@ -76,7 +76,7 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = Query::new();
+        let target = Query::default();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
@@ -152,7 +152,7 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = Query::new();
+        let target = Query::default();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
@@ -229,7 +229,7 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = Query::new();
+        let target = Query::default();
         let results = engine.search(&target).await;
         assert_eq!(
             results,

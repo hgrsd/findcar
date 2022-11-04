@@ -6,7 +6,7 @@ use std::io::{Error, ErrorKind};
 use super::{SearchResult, Searcher};
 use crate::{
     hit::{Hit, Mileage, Price},
-    query::{Query, SortBy, SortOrder},
+    query::Query,
 };
 
 const API_ROOT: &str = "https://www.donedeal.ie/ddapi/v1/search";
@@ -141,43 +141,12 @@ async fn recursive_fetch(
     }
 }
 
-fn apply_sort(sortBy: &SortBy, sortOrder: &SortOrder, mut hits: Vec<Hit>) -> Vec<Hit> {
-    match (sortBy, sortOrder) {
-        (SortBy::Price, SortOrder::Asc) => {
-            hits.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap());
-        }
-        (SortBy::Price, SortOrder::Desc) => {
-            hits.sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
-        }
-        (SortBy::Year, SortOrder::Asc) => {
-            hits.sort_by(|a, b| a.year.partial_cmp(&b.year).unwrap());
-        }
-        (SortBy::Year, SortOrder::Desc) => {
-            hits.sort_by(|a, b| b.year.partial_cmp(&a.year).unwrap());
-        }
-        (SortBy::Mileage, SortOrder::Asc) => {
-            hits.sort_by(|a, b| a.mileage.partial_cmp(&b.mileage).unwrap());
-        }
-        (SortBy::Mileage, SortOrder::Desc) => {
-            hits.sort_by(|a, b| b.mileage.partial_cmp(&a.mileage).unwrap());
-        }
-        _ => {}
-    }
-    hits
-}
-
 #[async_trait::async_trait]
 impl Searcher for DoneDealIE {
     async fn search(&self, query: &Query) -> SearchResult {
         let client = reqwest::Client::new();
         let ads = recursive_fetch(&client, query, 0, vec![]).await?;
-        let hits = ads.iter().map(Hit::from).collect();
-        let sorted = apply_sort(&query.sort_by, &query.sort_order, hits);
-        if let Some(limit) = query.limit {
-            Ok(sorted.into_iter().take(limit).collect())
-        } else {
-            Ok(sorted)
-        }
+        Ok(ads.iter().map(Hit::from).collect())
     }
 }
 
