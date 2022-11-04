@@ -127,7 +127,18 @@ impl Searcher for CarZoneIE {
     async fn search(&self, query: &Query) -> SearchResult {
         let client = reqwest::Client::new();
         let ads = recursive_fetch(&client, query, 1, vec![]).await?;
-        Ok(ads.iter().map(Hit::from).collect())
+        let mapped = ads
+            .iter()
+            // Note: Carzone places premium ads of different makes in the search returns. 
+            // Let's make sure we filter those out.
+            .filter(|x| {
+                query.make.is_some()
+                    && x.summary.searchDetailSummary.mmv.cleanMake.to_lowercase()
+                        == query.make.as_ref().unwrap().to_lowercase()
+            })
+            .map(Hit::from)
+            .collect();
+        Ok(mapped)
     }
 }
 
