@@ -9,6 +9,7 @@ mod query;
 mod search;
 
 use emit::{Emit, JsonEmitter, TextEmitter};
+use post_processing::{Action, Pipeline};
 
 #[tokio::main]
 async fn main() {
@@ -18,6 +19,9 @@ async fn main() {
     let searchers: Vec<Box<dyn search::Searcher>> = vec![Box::new(search::DoneDealIE {})];
     let engine = engine::Engine::with_searchers(searchers);
     let results = engine.search(&query).await;
+
+    let pipeline: Pipeline = (&args).into();
+    let processed = pipeline.execute(results);
 
     let emitter: Box<dyn Emit> = match args.emitter {
         Some(val) => {
@@ -29,5 +33,6 @@ async fn main() {
         }
         None => Box::new(TextEmitter::new()),
     };
-    emitter.emit(results);
+
+    emitter.emit(processed);
 }
