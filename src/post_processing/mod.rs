@@ -45,6 +45,7 @@ impl From<&Args> for Option<Box<Sort>> {
         }
     }
 }
+
 impl From<&Args> for Pipeline {
     fn from(args: &Args) -> Self {
         let mut actions: Vec<Box<dyn Action>> = vec![];

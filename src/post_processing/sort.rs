@@ -27,29 +27,28 @@ impl Sort {
 }
 
 impl Action for Sort {
-    fn execute(&self, hits: Vec<Hit>) -> Vec<Hit> {
-        let mut copy = hits.to_vec();
+    fn execute(&self, mut hits: Vec<Hit>) -> Vec<Hit> {
         match (&self.by, &self.order) {
             (SortBy::Price, SortOrder::Asc) => {
-                copy.sort_by_key(|x| x.price.clone());
+                hits.sort_by_key(|x| x.price.clone());
             }
             (SortBy::Price, SortOrder::Desc) => {
-                copy.sort_by_key(|x| Reverse(x.price.clone()));
+                hits.sort_by_key(|x| Reverse(x.price.clone()));
             }
             (SortBy::Year, SortOrder::Asc) => {
-                copy.sort_by_key(|x| x.year);
+                hits.sort_by_key(|x| x.year);
             }
             (SortBy::Year, SortOrder::Desc) => {
-                copy.sort_by_key(|x| Reverse(x.year));
+                hits.sort_by_key(|x| Reverse(x.year));
             }
             (SortBy::Mileage, SortOrder::Asc) => {
-                copy.sort_by_key(|x| x.mileage.clone());
+                hits.sort_by_key(|x| x.mileage.clone());
             }
             (SortBy::Mileage, SortOrder::Desc) => {
-                copy.sort_by_key(|x| Reverse(x.mileage.clone()));
+                hits.sort_by_key(|x| Reverse(x.mileage.clone()));
             }
         };
-        copy
+        hits
     }
 }
 
