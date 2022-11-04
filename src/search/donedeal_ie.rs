@@ -6,7 +6,7 @@ use std::io::{Error, ErrorKind};
 use super::{SearchResult, Searcher};
 use crate::{
     hit::{Hit, Mileage, Price},
-    target::Target,
+    query::{Query, SortOrder, SortBy},
 };
 
 const API_ROOT: &str = "https://www.donedeal.ie/ddapi/v1/search";
@@ -72,45 +72,45 @@ struct DonedealRequestBody {
 
 pub struct DoneDealIE {}
 
-fn ranges_from_target(target: &Target) -> Vec<Range> {
+fn ranges_from_query(query: &Query) -> Vec<Range> {
     let mut ranges = vec![];
 
-    if target.min_year.is_some() || target.max_year.is_some() {
+    if query.min_year.is_some() || query.max_year.is_some() {
         ranges.push(Range {
             name: "year".to_string(),
-            from: target.min_year.clone(),
-            to: target.max_year.clone(),
+            from: query.min_year.clone(),
+            to: query.max_year.clone(),
         })
     }
 
-    if target.min_kms.is_some() || target.max_kms.is_some() {
+    if query.min_kms.is_some() || query.max_kms.is_some() {
         ranges.push(Range {
             name: "mileage".to_string(),
-            from: target.min_kms.clone(),
-            to: target.max_kms.clone(),
+            from: query.min_kms.clone(),
+            to: query.max_kms.clone(),
         })
     }
 
-    if target.min_price.is_some() || target.max_price.is_some() {
+    if query.min_price.is_some() || query.max_price.is_some() {
         ranges.push(Range {
             name: "price".to_string(),
-            from: target.min_price.clone(),
-            to: target.max_price.clone(),
+            from: query.min_price.clone(),
+            to: query.max_price.clone(),
         })
     }
 
     ranges
 }
 
-fn request_from_target(target: &Target, from: u32) -> DonedealRequestBody {
+fn request_from_query(query: &Query, from: u32) -> DonedealRequestBody {
     DonedealRequestBody {
         makeModelFilters: vec![MakeModelFilter {
-            make: target.make.clone().unwrap_or("".to_string()),
-            model: target.model.clone().unwrap_or("".to_string()),
+            make: query.make.clone().unwrap_or("".to_string()),
+            model: query.model.clone().unwrap_or("".to_string()),
         }],
         paging: Paging { from, pageSize: 40 },
         filters: vec![],
-        ranges: ranges_from_target(target),
+        ranges: ranges_from_query(query),
         sections: vec!["cars".to_string()],
     }
 }
@@ -118,11 +118,11 @@ fn request_from_target(target: &Target, from: u32) -> DonedealRequestBody {
 #[async_recursion::async_recursion]
 async fn recursive_fetch(
     client: &reqwest::Client,
-    target: &Target,
+    query: &Query,
     n: u32,
     mut collected: Vec<DonedealAd>,
 ) -> Result<Vec<DonedealAd>, Error> {
-    let req = request_from_target(target, n);
+    let req = request_from_query(query, n);
     let res = client
         .post(API_ROOT)
         .json(&req)
@@ -135,18 +135,49 @@ async fn recursive_fetch(
     let mut current_ads = res.ads.unwrap_or(vec![]);
     collected.append(&mut current_ads);
     if res.paging.nextFrom > 0 {
-        Ok(recursive_fetch(client, target, res.paging.nextFrom, collected).await?)
+        Ok(recursive_fetch(client, query, res.paging.nextFrom, collected).await?)
     } else {
         Ok(collected)
     }
 }
 
+fn apply_sort(sortBy: &SortBy, sortOrder: &SortOrder, mut hits: Vec<Hit>) -> Vec<Hit> {
+    match (sortBy, sortOrder) {
+        (SortBy::Price, SortOrder::Asc) => {
+            hits.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap());
+        },
+        (SortBy::Price, SortOrder::Desc) => {
+            hits.sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
+        },
+        (SortBy::Year, SortOrder::Asc) => {
+            hits.sort_by(|a, b| a.year.partial_cmp(&b.year).unwrap());
+        },
+        (SortBy::Year, SortOrder::Desc) => {
+            hits.sort_by(|a, b| b.year.partial_cmp(&a.year).unwrap());
+        },
+        (SortBy::Mileage, SortOrder::Asc) => {
+            hits.sort_by(|a, b| a.mileage.partial_cmp(&b.mileage).unwrap());
+        },
+        (SortBy::Mileage, SortOrder::Desc) => {
+            hits.sort_by(|a, b| b.mileage.partial_cmp(&a.mileage).unwrap());
+        },
+        _ => {},
+    }
+    hits
+}
+
 #[async_trait::async_trait]
 impl Searcher for DoneDealIE {
-    async fn search(&self, target: &Target) -> SearchResult {
+    async fn search(&self, query: &Query) -> SearchResult {
         let client = reqwest::Client::new();
-        let ads = recursive_fetch(&client, target, 0, vec![]).await?;
-        Ok(ads.iter().map(Hit::from).collect())
+        let ads = recursive_fetch(&client, query, 0, vec![]).await?;
+        let hits = ads.iter().map(Hit::from).collect();
+        let sorted = apply_sort(&query.sort_by, &query.sort_order, hits);
+        if let Some(limit) = query.limit {
+            Ok(sorted.into_iter().take(limit).collect())
+        } else {
+            Ok(sorted)
+        }
     }
 }
 

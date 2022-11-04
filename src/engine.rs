@@ -2,7 +2,7 @@ use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::hit::Hit;
 use crate::search::{SearchResult, Searcher};
-use crate::target::Target;
+use crate::query::Query;
 
 pub struct Engine {
     searchers: Vec<Box<dyn Searcher>>,
@@ -13,10 +13,10 @@ impl Engine {
         Engine { searchers }
     }
 
-    pub async fn search(&self, target: &Target) -> Vec<Hit> {
+    pub async fn search(&self, query: &Query) -> Vec<Hit> {
         let futures = FuturesUnordered::new();
         for searcher in &self.searchers {
-            futures.push(searcher.search(target));
+            futures.push(searcher.search(query));
         }
 
         let results: Vec<SearchResult> = futures.collect().await;
@@ -41,10 +41,7 @@ mod tests {
     use super::*;
     use async_trait::async_trait;
 
-    use crate::{
-        hit::{Mileage, Price},
-        target::Target,
-    };
+    use crate::hit::{Mileage, Price};
     use std::io::{Error, ErrorKind};
 
     #[tokio::test]
@@ -52,7 +49,7 @@ mod tests {
         struct S {}
         #[async_trait]
         impl Searcher for S {
-            async fn search(&self, _target: &Target) -> SearchResult {
+            async fn search(&self, _q: &Query) -> SearchResult {
                 Ok(vec![
                     Hit {
                         mileage: Mileage::Km(10000),
@@ -79,7 +76,7 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = Target::new();
+        let target = Query::new();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
@@ -113,7 +110,7 @@ mod tests {
 
         #[async_trait]
         impl Searcher for S0 {
-            async fn search(&self, _target: &Target) -> SearchResult {
+            async fn search(&self, _target: &Query) -> SearchResult {
                 Ok(vec![
                     Hit {
                         mileage: Mileage::Km(10000),
@@ -139,7 +136,7 @@ mod tests {
 
         #[async_trait]
         impl Searcher for S1 {
-            async fn search(&self, _target: &Target) -> SearchResult {
+            async fn search(&self, _target: &Query) -> SearchResult {
                 Ok(vec![Hit {
                     mileage: Mileage::Km(10000),
                     year: 2022,
@@ -155,7 +152,7 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = Target::new();
+        let target = Query::new();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
@@ -198,7 +195,7 @@ mod tests {
 
         #[async_trait]
         impl Searcher for S0 {
-            async fn search(&self, _target: &Target) -> SearchResult {
+            async fn search(&self, _target: &Query) -> SearchResult {
                 Ok(vec![
                     Hit {
                         mileage: Mileage::Km(10000),
@@ -224,7 +221,7 @@ mod tests {
 
         #[async_trait]
         impl Searcher for S1 {
-            async fn search(&self, _target: &Target) -> SearchResult {
+            async fn search(&self, _target: &Query) -> SearchResult {
                 Err(Error::new(ErrorKind::Other, "oh no"))
             }
         }
@@ -232,7 +229,7 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = Target::new();
+        let target = Query::new();
         let results = engine.search(&target).await;
         assert_eq!(
             results,

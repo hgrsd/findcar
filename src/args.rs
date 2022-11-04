@@ -26,4 +26,13 @@ pub struct Args {
 
     #[arg(long)]
     pub max_price: Option<String>,
+
+    #[arg(long)]
+    pub sort_by: Option<String>,
+
+    #[arg(long)]
+    pub sort_order: Option<String>,
+
+    #[arg(long)]
+    pub limit: Option<usize>,
 }
