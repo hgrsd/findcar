@@ -4,6 +4,7 @@ mod args;
 mod emit;
 mod engine;
 mod hit;
+mod post_processing;
 mod query;
 mod search;
 

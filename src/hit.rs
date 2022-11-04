@@ -15,7 +15,7 @@ pub enum Mileage {
     Unknown,
 }
 
-#[derive(Debug, Eq, PartialEq, Serialize)]
+#[derive(Debug, Eq, PartialEq, Serialize, Clone)]
 pub struct Hit {
     pub search_engine: String,
     pub make: String,

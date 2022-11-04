@@ -27,7 +27,6 @@ impl Default for Query {
     }
 }
 
-
 impl From<&Args> for Query {
     fn from(args: &Args) -> Self {
         Self {
@@ -42,4 +41,3 @@ impl From<&Args> for Query {
         }
     }
 }
-
