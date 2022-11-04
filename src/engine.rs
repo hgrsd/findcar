@@ -27,7 +27,7 @@ impl Engine {
                     successes.append(inner);
                 }
                 Err(error) => {
-                    println!("An error was encountered in this search engine, results unavailable.\nReason: {}", error);
+                    println!("An error was encountered in a search engine, results unavailable.\nReason: {}", error);
                 }
             }
         }
@@ -41,7 +41,11 @@ mod tests {
     use super::*;
     use async_trait::async_trait;
 
-    use crate::{hit::Price, searcher::Searcher, target::TargetBuilder};
+    use crate::{
+        hit::{Mileage, Price},
+        searcher::Searcher,
+        target::Target,
+    };
     use std::io::{Error, ErrorKind};
 
     #[tokio::test]
@@ -52,17 +56,21 @@ mod tests {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![
                     Hit {
+                        mileage: Mileage::Km(10000),
+                        year: 2022,
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::EUR(19995, 50)),
+                        price: Some(Price::Eur(19995)),
                         url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
+                        mileage: Mileage::Km(10000),
+                        year: 2022,
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::EUR(19995, 50)),
+                        price: Some(Price::Eur(19995)),
                         url: "https://mycar.com/car".to_string(),
                     },
                 ])
@@ -72,23 +80,27 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = TargetBuilder::new().build();
+        let target = Target::new();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
             vec!(
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::EUR(19995, 50)),
+                    price: Some(Price::Eur(19995)),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::EUR(19995, 50)),
+                    price: Some(Price::Eur(19995)),
                     url: "https://mycar.com/car".to_string(),
                 },
             )
@@ -105,17 +117,21 @@ mod tests {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![
                     Hit {
+                        mileage: Mileage::Km(10000),
+                        year: 2022,
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::EUR(19995, 50)),
+                        price: Some(Price::Eur(19995)),
                         url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
+                        mileage: Mileage::Km(10000),
+                        year: 2022,
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::EUR(19995, 50)),
+                        price: Some(Price::Eur(19995)),
                         url: "https://mycar.com/car".to_string(),
                     },
                 ])
@@ -126,10 +142,12 @@ mod tests {
         impl Searcher for S1 {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
-                    price: Some(Price::EUR(25000, 99)),
+                    price: Some(Price::Eur(25000)),
                     url: "https://mycar.com/car".to_string(),
                 }])
             }
@@ -138,30 +156,36 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = TargetBuilder::new().build();
+        let target = Target::new();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
             vec!(
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::EUR(19995, 50)),
+                    price: Some(Price::Eur(19995)),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::EUR(19995, 50)),
+                    price: Some(Price::Eur(19995)),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
-                    price: Some(Price::EUR(25000, 99)),
+                    price: Some(Price::Eur(25000)),
                     url: "https://mycar.com/car".to_string(),
                 },
             )
@@ -178,17 +202,21 @@ mod tests {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![
                     Hit {
+                        mileage: Mileage::Km(10000),
+                        year: 2022,
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::EUR(19995, 50)),
+                        price: Some(Price::Eur(19995)),
                         url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
+                        mileage: Mileage::Km(10000),
+                        year: 2022,
                         search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Some(Price::EUR(19995, 50)),
+                        price: Some(Price::Eur(19995)),
                         url: "https://mycar.com/car".to_string(),
                     },
                 ])
@@ -205,23 +233,27 @@ mod tests {
         let searchers: Vec<Box<dyn Searcher>> = vec![Box::new(S0 {}), Box::new(S1 {})];
         let engine = Engine::with_searchers(searchers);
 
-        let target = TargetBuilder::new().build();
+        let target = Target::new();
         let results = engine.search(&target).await;
         assert_eq!(
             results,
             vec!(
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::EUR(19995, 50)),
+                    price: Some(Price::Eur(19995)),
                     url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    mileage: Mileage::Km(10000),
+                    year: 2022,
                     search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Some(Price::EUR(19995, 50)),
+                    price: Some(Price::Eur(19995)),
                     url: "https://mycar.com/car".to_string(),
                 },
             )

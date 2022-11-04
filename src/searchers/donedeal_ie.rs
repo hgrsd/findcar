@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::io::{Error, ErrorKind};
 
 use crate::{
-    hit::{Hit, Price},
+    hit::{Hit, Mileage, Price},
     searcher::{SearchResult, Searcher},
     target::Target,
 };
@@ -57,8 +57,8 @@ struct Filter {
 #[derive(Serialize)]
 struct Range {
     name: String,
-    from: String,
-    to: String,
+    from: Option<String>,
+    to: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -72,6 +72,36 @@ struct DonedealRequestBody {
 
 pub struct DoneDealIE {}
 
+fn ranges_from_target(target: &Target) -> Vec<Range> {
+    let mut ranges = vec![];
+
+    if target.min_year.is_some() || target.max_year.is_some() {
+        ranges.push(Range {
+            name: "year".to_string(),
+            from: target.min_year.clone(),
+            to: target.max_year.clone(),
+        })
+    }
+
+    if target.min_kms.is_some() || target.max_kms.is_some() {
+        ranges.push(Range {
+            name: "mileage".to_string(),
+            from: target.min_kms.clone(),
+            to: target.max_kms.clone(),
+        })
+    }
+
+    if target.min_price.is_some() || target.max_price.is_some() {
+        ranges.push(Range {
+            name: "price".to_string(),
+            from: target.min_price.clone(),
+            to: target.max_price.clone(),
+        })
+    }
+
+    ranges
+}
+
 fn request_from_target(target: &Target, from: u32) -> DonedealRequestBody {
     DonedealRequestBody {
         makeModelFilters: vec![MakeModelFilter {
@@ -80,13 +110,13 @@ fn request_from_target(target: &Target, from: u32) -> DonedealRequestBody {
         }],
         paging: Paging { from, pageSize: 40 },
         filters: vec![],
-        ranges: vec![],
+        ranges: ranges_from_target(target),
         sections: vec!["cars".to_string()],
     }
 }
 
 #[async_recursion::async_recursion]
-async fn recurse(
+async fn recursive_fetch(
     client: &reqwest::Client,
     target: &Target,
     n: u32,
@@ -105,7 +135,7 @@ async fn recurse(
     let mut current_ads = res.ads.unwrap_or(vec![]);
     collected.append(&mut current_ads);
     if res.paging.nextFrom > 0 {
-        Ok(recurse(client, target, res.paging.nextFrom, collected).await?)
+        Ok(recursive_fetch(client, target, res.paging.nextFrom, collected).await?)
     } else {
         Ok(collected)
     }
@@ -115,7 +145,7 @@ async fn recurse(
 impl Searcher for DoneDealIE {
     async fn search(&self, target: &Target) -> SearchResult {
         let client = reqwest::Client::new();
-        let ads = recurse(&client, target, 0, vec![]).await?;
+        let ads = recursive_fetch(&client, target, 0, vec![]).await?;
         Ok(ads.iter().map(Hit::from).collect())
     }
 }
@@ -129,11 +159,33 @@ impl From<&DonedealAd> for Option<Price> {
         let unwrapped = ad.price.as_ref().unwrap();
         let parsed: i32 = unwrapped.replace(",", "").parse().unwrap();
         Some(match ad.currency.as_str() {
-            "EUR" => Price::EUR(parsed, 0),
-            "GBP" => Price::GBP(parsed, 0),
-            "USD" => Price::USD(parsed, 0),
+            "EUR" => Price::Eur(parsed),
+            "GBP" => Price::Gbp(parsed),
+            "USD" => Price::Usd(parsed),
             _ => unreachable!(),
         })
+    }
+}
+
+impl From<&DonedealAd> for Mileage {
+    fn from(ad: &DonedealAd) -> Self {
+        let mileage = ad
+            .displayAttributes
+            .iter()
+            .find(|attr| attr.name == "mileage");
+        match mileage {
+            None => Mileage::Unknown,
+            Some(m) => {
+                let cleaned = m.value.replace(',', "");
+                let split: Vec<&str> = cleaned.split_whitespace().collect();
+                let number: i32 = split[0].parse().unwrap();
+                match split[1] {
+                    "km" => Mileage::Km(number),
+                    "mi" => Mileage::Mi(number),
+                    _ => Mileage::Unknown,
+                }
+            }
+        }
     }
 }
 
@@ -151,7 +203,15 @@ impl From<&DonedealAd> for Hit {
             .find(|attr| attr.name == "model")
             .map_or("N/A", |model| &model.value);
 
+        let year = ad
+            .displayAttributes
+            .iter()
+            .find(|attr| attr.name == "year")
+            .map_or(0, |year| year.value.parse().unwrap());
+
         Hit {
+            mileage: ad.into(),
+            year,
             search_engine: "donedeal.ie".to_string(),
             make: make.to_string(),
             model: model.to_string(),

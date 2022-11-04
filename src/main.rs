@@ -10,17 +10,40 @@ mod target;
 #[tokio::main]
 async fn main() {
     let args = args::Args::parse();
-    let mut target_builder = target::TargetBuilder::new();
+    let mut target = target::Target::new();
 
     if let Some(make) = args.make {
-        target_builder.make(&make);
+        target.make(&make);
     }
 
     if let Some(model) = args.model {
-        target_builder.model(&model);
+        target.model(&model);
     }
 
-    let target = target_builder.build();
+    if let Some(min_year) = args.min_year {
+        target.min_year(&min_year);
+    }
+
+    if let Some(max_year) = args.max_year {
+        target.max_year(&max_year);
+    }
+
+    if let Some(min_kms) = args.min_kms {
+        target.min_kms(&min_kms);
+    }
+
+    if let Some(max_kms) = args.max_kms {
+        target.max_kms(&max_kms);
+    }
+
+    if let Some(min_price) = args.min_price {
+        target.min_price(&min_price);
+    }
+
+    if let Some(max_price) = args.max_price {
+        target.max_price(&max_price);
+    }
+
     let searchers: Vec<Box<dyn searcher::Searcher>> =
         vec![Box::new(searchers::donedeal_ie::DoneDealIE {})];
 

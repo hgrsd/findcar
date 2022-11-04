@@ -8,4 +8,22 @@ pub struct Args {
 
     #[arg(long)]
     pub model: Option<String>,
+
+    #[arg(long)]
+    pub min_year: Option<String>,
+
+    #[arg(long)]
+    pub max_year: Option<String>,
+
+    #[arg(long)]
+    pub min_kms: Option<String>,
+
+    #[arg(long)]
+    pub max_kms: Option<String>,
+
+    #[arg(long)]
+    pub min_price: Option<String>,
+
+    #[arg(long)]
+    pub max_price: Option<String>,
 }
