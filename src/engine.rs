@@ -27,10 +27,7 @@ impl Engine {
                     successes.append(inner);
                 }
                 Err(error) => {
-                    println!(
-                        "An error was encountered in this search engine, results unavailable.\nReason: {}",
-                        error.to_string()
-                    );
+                    println!("An error was encountered in this search engine, results unavailable.\nReason: {}", error);
                 }
             }
         }
@@ -55,14 +52,18 @@ mod tests {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![
                     Hit {
+                        search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Price::EUR(19995, 50),
+                        price: Some(Price::EUR(19995, 50)),
+                        url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
+                        search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Price::EUR(19995, 50),
+                        price: Some(Price::EUR(19995, 50)),
+                        url: "https://mycar.com/car".to_string(),
                     },
                 ])
             }
@@ -77,14 +78,18 @@ mod tests {
             results,
             vec!(
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Price::EUR(19995, 50),
+                    price: Some(Price::EUR(19995, 50)),
+                    url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Price::EUR(19995, 50),
+                    price: Some(Price::EUR(19995, 50)),
+                    url: "https://mycar.com/car".to_string(),
                 },
             )
         );
@@ -100,14 +105,18 @@ mod tests {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![
                     Hit {
+                        search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Price::EUR(19995, 50),
+                        price: Some(Price::EUR(19995, 50)),
+                        url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
+                        search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Price::EUR(19995, 50),
+                        price: Some(Price::EUR(19995, 50)),
+                        url: "https://mycar.com/car".to_string(),
                     },
                 ])
             }
@@ -117,9 +126,11 @@ mod tests {
         impl Searcher for S1 {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![Hit {
+                    search_engine: "bla".to_string(),
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
-                    price: Price::EUR(25000, 99),
+                    price: Some(Price::EUR(25000, 99)),
+                    url: "https://mycar.com/car".to_string(),
                 }])
             }
         }
@@ -133,19 +144,25 @@ mod tests {
             results,
             vec!(
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Price::EUR(19995, 50),
+                    price: Some(Price::EUR(19995, 50)),
+                    url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Price::EUR(19995, 50),
+                    price: Some(Price::EUR(19995, 50)),
+                    url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Volkswagen".to_string(),
                     model: "Golf".to_string(),
-                    price: Price::EUR(25000, 99),
+                    price: Some(Price::EUR(25000, 99)),
+                    url: "https://mycar.com/car".to_string(),
                 },
             )
         );
@@ -161,14 +178,18 @@ mod tests {
             async fn search(&self, _target: &Target) -> SearchResult {
                 Ok(vec![
                     Hit {
+                        search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Price::EUR(19995, 50),
+                        price: Some(Price::EUR(19995, 50)),
+                        url: "https://mycar.com/car".to_string(),
                     },
                     Hit {
+                        search_engine: "bla".to_string(),
                         make: "Skoda".to_string(),
                         model: "Fabia".to_string(),
-                        price: Price::EUR(19995, 50),
+                        price: Some(Price::EUR(19995, 50)),
+                        url: "https://mycar.com/car".to_string(),
                     },
                 ])
             }
@@ -190,14 +211,18 @@ mod tests {
             results,
             vec!(
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Price::EUR(19995, 50),
+                    price: Some(Price::EUR(19995, 50)),
+                    url: "https://mycar.com/car".to_string(),
                 },
                 Hit {
+                    search_engine: "bla".to_string(),
                     make: "Skoda".to_string(),
                     model: "Fabia".to_string(),
-                    price: Price::EUR(19995, 50),
+                    price: Some(Price::EUR(19995, 50)),
+                    url: "https://mycar.com/car".to_string(),
                 },
             )
         );

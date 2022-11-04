@@ -4,6 +4,7 @@ mod args;
 mod engine;
 mod hit;
 mod searcher;
+mod searchers;
 mod target;
 
 #[tokio::main]
@@ -20,6 +21,14 @@ async fn main() {
     }
 
     let target = target_builder.build();
+    let searchers: Vec<Box<dyn searcher::Searcher>> =
+        vec![Box::new(searchers::donedeal_ie::DoneDealIE {})];
 
-    println!("search target: \n{:?}", target);
+    let engine = engine::Engine::with_searchers(searchers);
+
+    let results = engine.search(&target).await;
+
+    for result in results {
+        println!("{:?}", result);
+    }
 }
