@@ -178,7 +178,12 @@ impl From<&DonedealAd> for Mileage {
             Some(m) => {
                 let cleaned = m.value.replace(',', "");
                 let split: Vec<&str> = cleaned.split_whitespace().collect();
-                let number: i32 = split[0].parse().unwrap();
+
+                if split.len() != 2 {
+                    return Mileage::Unknown;
+                }
+
+                let number: i32 = split[0].parse().unwrap_or(0);
                 match split[1] {
                     "km" => Mileage::Km(number),
                     "mi" => Mileage::Mi(number),
@@ -207,7 +212,7 @@ impl From<&DonedealAd> for Hit {
             .displayAttributes
             .iter()
             .find(|attr| attr.name == "year")
-            .map_or(0, |year| year.value.parse().unwrap());
+            .map_or(0, |year| year.value.parse().unwrap_or(0));
 
         Hit {
             mileage: ad.into(),
