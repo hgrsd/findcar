@@ -4,10 +4,10 @@ mod args;
 mod emit;
 mod engine;
 mod hit;
-mod search;
 mod query;
+mod search;
 
-use emit::{Emit, TextEmitter};
+use emit::{Emit, JsonEmitter, TextEmitter};
 
 #[tokio::main]
 async fn main() {
@@ -62,6 +62,15 @@ async fn main() {
     let engine = engine::Engine::with_searchers(searchers);
     let results = engine.search(&query).await;
 
-    let emitter = TextEmitter::new();
+    let emitter: Box<dyn Emit> = match args.emitter {
+        Some(val) => {
+            if val.to_uppercase() == "JSON" {
+                Box::new(JsonEmitter::new())
+            } else {
+                Box::new(TextEmitter::new())
+            }
+        }
+        None => Box::new(TextEmitter::new()),
+    };
     emitter.emit(results);
 }

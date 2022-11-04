@@ -6,7 +6,7 @@ use std::io::{Error, ErrorKind};
 use super::{SearchResult, Searcher};
 use crate::{
     hit::{Hit, Mileage, Price},
-    query::{Query, SortOrder, SortBy},
+    query::{Query, SortBy, SortOrder},
 };
 
 const API_ROOT: &str = "https://www.donedeal.ie/ddapi/v1/search";
@@ -145,23 +145,23 @@ fn apply_sort(sortBy: &SortBy, sortOrder: &SortOrder, mut hits: Vec<Hit>) -> Vec
     match (sortBy, sortOrder) {
         (SortBy::Price, SortOrder::Asc) => {
             hits.sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap());
-        },
+        }
         (SortBy::Price, SortOrder::Desc) => {
             hits.sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
-        },
+        }
         (SortBy::Year, SortOrder::Asc) => {
             hits.sort_by(|a, b| a.year.partial_cmp(&b.year).unwrap());
-        },
+        }
         (SortBy::Year, SortOrder::Desc) => {
             hits.sort_by(|a, b| b.year.partial_cmp(&a.year).unwrap());
-        },
+        }
         (SortBy::Mileage, SortOrder::Asc) => {
             hits.sort_by(|a, b| a.mileage.partial_cmp(&b.mileage).unwrap());
-        },
+        }
         (SortBy::Mileage, SortOrder::Desc) => {
             hits.sort_by(|a, b| b.mileage.partial_cmp(&a.mileage).unwrap());
-        },
-        _ => {},
+        }
+        _ => {}
     }
     hits
 }

@@ -1,4 +1,6 @@
-#[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Clone)]
+use serde::Serialize;
+
+#[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Clone, Serialize)]
 pub enum Price {
     Eur(i32),
     Usd(i32),
@@ -6,14 +8,14 @@ pub enum Price {
     Unknown,
 }
 
-#[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Clone)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Clone, Serialize)]
 pub enum Mileage {
     Km(i32),
     Mi(i32),
     Unknown,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Serialize)]
 pub struct Hit {
     pub search_engine: String,
     pub make: String,

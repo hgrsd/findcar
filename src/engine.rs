@@ -1,8 +1,8 @@
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::hit::Hit;
-use crate::search::{SearchResult, Searcher};
 use crate::query::Query;
+use crate::search::{SearchResult, Searcher};
 
 pub struct Engine {
     searchers: Vec<Box<dyn Searcher>>,

@@ -35,4 +35,7 @@ pub struct Args {
 
     #[arg(long)]
     pub limit: Option<usize>,
+
+    #[arg(long)]
+    pub emitter: Option<String>,
 }
