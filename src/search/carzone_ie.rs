@@ -13,13 +13,21 @@ const API_ROOT: &str = "https://www.carzone.ie/rest/1.0/Car/stock";
 
 #[derive(Serialize)]
 struct CarzoneQueryParams {
+    #[serde(skip_serializing_if = "Option::is_none")]
     make: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     model: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     minPrice: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     maxPrice: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     minYear: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     maxYear: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     minMileage: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     maxMileage: Option<String>,
     showPoa: String,
     page: String,
@@ -132,8 +140,8 @@ impl Searcher for CarZoneIE {
             // Note: Carzone places premium ads of different makes in the search returns.
             // Let's make sure we filter those out.
             .filter(|x| {
-                query.make.is_some()
-                    && x.summary.searchDetailSummary.mmv.cleanMake.to_lowercase()
+                query.make.is_none()
+                    || x.summary.searchDetailSummary.mmv.cleanMake.to_lowercase()
                         == query.make.as_ref().unwrap().to_lowercase()
             })
             .map(Hit::from)
