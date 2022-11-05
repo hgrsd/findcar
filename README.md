@@ -2,6 +2,17 @@
 
 A cli that lets you search, sort, aggregate and filter results from multiple car search engines. Because of course you want to search for cars from the command line.
 
+# Examples
+
+## Text-based rendering
+
+![text-based rendering](https://github.com/hgrsd/findcar/blob/main/assets/screenshots/text.png)
+
+## JSON-based rendering
+
+![json-based rendering](https://github.com/hgrsd/findcar/blob/main/assets/screenshots/json.png)
+
+
 # Usage
 
 ```
