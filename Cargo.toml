@@ -1,8 +1,8 @@
 [package]
 name = "findcar"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
-description = "An extensible CLI tool that filters, sorts, and aggregates search results from car websites"
+description = "An extensible CLI tool that filters, sorts, and aggregates search results from car websites. Because of course you want to search for cars from the command line."
 license = "MIT"
 keywords = ["car", "aggregation", "search", "engine", "motoring"]
 exclude = [".github/", ".gitignore"]
