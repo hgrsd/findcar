@@ -2,6 +2,7 @@ use crate::{args::Args, hit::Hit};
 
 use super::Action;
 
+/// A limit action, which applies a cutoff to a set of Hits.
 pub struct Limit {
     limit: usize,
 }

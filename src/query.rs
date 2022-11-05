@@ -1,5 +1,7 @@
 use crate::args::Args;
 
+/// The query object that is the input to the root engine, and to each of the individual
+/// search engines.
 #[derive(Debug, Clone)]
 pub struct Query {
     pub make: Option<String>,

@@ -4,6 +4,8 @@ use crate::{args::Args, hit::Hit};
 
 use super::Action;
 
+/// A sorting action, which sorts a given set of Hits by the provided SortBy using the provided
+/// SortOrder.
 pub struct Sort {
     by: SortBy,
     order: SortOrder,

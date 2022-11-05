@@ -4,15 +4,18 @@ use crate::hit::Hit;
 use crate::query::Query;
 use crate::search::{SearchResult, Searcher};
 
+/// The root engine which drives several search engines, combining their results.
 pub struct Engine {
     searchers: Vec<Box<dyn Searcher>>,
 }
 
 impl Engine {
+    /// Create a new root engine with the provided searchers
     pub fn with_searchers(searchers: Vec<Box<dyn Searcher>>) -> Self {
         Engine { searchers }
     }
 
+    /// Run a search
     pub async fn search(&self, query: &Query) -> Vec<Hit> {
         let futures = FuturesUnordered::new();
         for searcher in &self.searchers {

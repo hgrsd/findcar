@@ -15,6 +15,8 @@ pub enum Mileage {
     Unknown,
 }
 
+/// The domain object that encodes a search hit, agnostic of which search engine has provided it.
+/// This is the core model that drives further processing.
 #[derive(Debug, Eq, PartialEq, Serialize, Clone)]
 pub struct Hit {
     pub search_engine: String,
