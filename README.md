@@ -1,3 +1,5 @@
+![CI](https://github.com/hgrsd/findcar/actions/workflows/ci.yaml/badge.svg?branch=main)
+
 # findcar
 
 A cli that lets you search, sort, aggregate and filter results from multiple car search engines. Because of course you want to search for cars from the command line.
