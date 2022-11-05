@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 description = "An extensible CLI tool that filters, sorts, and aggregates search results from car websites"
 license = "MIT"
-keywords = ["car", "aggregation", "search", "search engine", "motoring", "vehicle"]
+keywords = ["car", "aggregation", "search", "engine", "motoring"]
 exclude = [".github/", ".gitignore"]
 repository = "https://github.com/hgrsd/findcar"
 
