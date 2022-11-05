@@ -1,7 +1,12 @@
 [package]
 name = "findcar"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
+description = "An extensible CLI tool that filters, sorts, and aggregates search results from car websites"
+license = "MIT"
+keywords = ["car", "aggregation", "search", "search engine", "motoring", "vehicle"]
+exclude = [".github/", ".gitignore"]
+repository = "https://github.com/hgrsd/findcar"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
