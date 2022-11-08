@@ -48,7 +48,7 @@ pub struct Args {
     #[arg(long)]
     pub limit: Option<usize>,
 
-    /// Optional, emitter for the results. Options are: json, text. Default is text.
+    /// Optional, emitter for the results. Options are: csv, json, text. Default is text.
     #[arg(long)]
     pub emitter: Option<String>,
 

@@ -45,7 +45,7 @@ Options:
       --limit <LIMIT>
           Optional, maximum number of results to return
       --emitter <EMITTER>
-          Optional, emitter for the results. Options are: json, text. Default is text
+          Optional, emitter for the results. Options are: csv, json, text. Default is text
       --search-engine <SEARCH_ENGINE>
           Optional, search engine to use. Options are donedeal_ie, carzone_ie. 
           Default is to use all available engines. 
