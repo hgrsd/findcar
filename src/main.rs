@@ -8,7 +8,7 @@ mod post_processing;
 mod query;
 mod search;
 
-use emit::{Emit, JsonEmitter, TextEmitter};
+use emit::{CsvEmitter, Emit, JsonEmitter, TextEmitter};
 use post_processing::{Action, Pipeline};
 
 #[tokio::main]
@@ -47,6 +47,8 @@ async fn main() {
         Some(val) => {
             if val.to_uppercase() == "JSON" {
                 Box::new(JsonEmitter::new())
+            } else if val.to_uppercase() == "CSV" {
+                Box::new(CsvEmitter::new())
             } else {
                 Box::new(TextEmitter::new())
             }
