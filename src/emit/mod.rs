@@ -1,7 +1,9 @@
 use crate::hit::Hit;
 
+mod csv;
 mod json;
 mod text;
+pub use self::csv::CsvEmitter;
 pub use json::JsonEmitter;
 pub use text::TextEmitter;
 
