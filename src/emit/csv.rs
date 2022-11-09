@@ -12,11 +12,11 @@ impl CsvEmitter {
 
 impl Emit for CsvEmitter {
     fn emit(&self, hits: Vec<Hit>) {
-        let mut wtr = csv::Writer::from_writer(vec![]);
+        let mut wtr = csv::Writer::from_writer(std::io::stdout());
 
         for hit in hits {
             wtr.serialize(hit).unwrap();
         }
-        println!("{}", String::from_utf8(wtr.into_inner().unwrap()).unwrap());
+        wtr.flush().expect("Error flushing CSV to stdout");
     }
 }
