@@ -1,9 +1,7 @@
-use crate::{args::Args, hit::Hit};
+use crate::hit::Hit;
 
-use self::{limit::Limit, sort::Sort};
-
-mod limit;
-mod sort;
+pub mod limit;
+pub mod sort;
 
 /// A trait for any post-processing action that takes hits and process them
 pub trait Action {
@@ -17,20 +15,8 @@ pub struct Pipeline {
     actions: Vec<Box<dyn Action>>,
 }
 
-impl From<&Args> for Pipeline {
-    fn from(args: &Args) -> Self {
-        let mut actions: Vec<Box<dyn Action>> = vec![];
-
-        let sort: Option<Box<Sort>> = args.into();
-        if let Some(s) = sort {
-            actions.push(s);
-        }
-
-        let limit: Option<Box<Limit>> = args.into();
-        if let Some(l) = limit {
-            actions.push(l);
-        }
-
+impl Pipeline {
+    pub fn from(actions: Vec<Box<dyn Action>>) -> Pipeline {
         Pipeline { actions }
     }
 }

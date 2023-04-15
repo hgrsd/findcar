@@ -1,4 +1,4 @@
-use crate::{args::Args, hit::Hit};
+use crate::hit::Hit;
 
 use super::Action;
 
@@ -16,15 +16,6 @@ impl Limit {
 impl Action for Limit {
     fn execute(&self, hits: Vec<Hit>) -> Vec<Hit> {
         hits.into_iter().take(self.limit).collect()
-    }
-}
-
-impl From<&Args> for Option<Box<Limit>> {
-    fn from(args: &Args) -> Self {
-        match args.limit {
-            Some(lim) => Some(Box::new(Limit::new(lim))),
-            None => None,
-        }
     }
 }
 

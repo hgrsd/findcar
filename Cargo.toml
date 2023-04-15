@@ -1,6 +1,6 @@
 [package]
 name = "findcar"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 description = "An extensible CLI tool that filters, sorts, and aggregates search results from car websites. Because of course you want to search for cars from the command line."
 license = "MIT"
